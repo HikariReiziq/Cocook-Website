@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, ChefHat, Play, Users } from 'lucide-react';
-import { recipeService } from '../services';
+import { ArrowLeft, Clock, ChefHat, Play, Users, Edit2, Trash2, AlertTriangle } from 'lucide-react';
+import { recipeService, inventoryService } from '../services';
+import { useAuth } from '../context/AuthContext';
 
 const RecipeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [missingIngredients, setMissingIngredients] = useState([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     fetchRecipe();
@@ -19,12 +23,64 @@ const RecipeDetail = () => {
       const response = await recipeService.getById(id);
       if (response.success) {
         setRecipe(response.data);
+        await checkIngredientAvailability(response.data);
       }
     } catch (error) {
       console.error('Error fetching recipe:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkIngredientAvailability = async (recipeData) => {
+    try {
+      const inventoryResponse = await inventoryService.getAll();
+      if (inventoryResponse.success) {
+        const inventory = inventoryResponse.data;
+        const missing = [];
+
+        recipeData.ingredients.forEach(ingredient => {
+          const found = inventory.find(item => 
+            item.ingredientName.toLowerCase() === ingredient.ingredientName.toLowerCase() &&
+            item.quantity >= ingredient.quantity
+          );
+          
+          if (!found) {
+            missing.push(ingredient);
+          }
+        });
+
+        setMissingIngredients(missing);
+      }
+    } catch (error) {
+      console.error('Error checking ingredients:', error);
+    }
+  };
+
+  const handleStartCooking = () => {
+    if (missingIngredients.length > 0) {
+      const missingList = missingIngredients.map(ing => 
+        `${ing.ingredientName}${ing.variant ? ' - ' + ing.variant : ''}: ${ing.quantity} ${ing.unit}`
+      ).join('\n');
+      
+      alert(`⚠️ Bahan-bahan Anda untuk membuat resep ini belum memenuhi!\n\nBahan yang kurang:\n${missingList}`);
+      return;
+    }
+    navigate(`/recipe/${recipe._id}/cook`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await recipeService.delete(recipe._id);
+      if (response.success) {
+        alert('✅ Resep berhasil dihapus!');
+        navigate('/recipe');
+      }
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      alert(error.response?.data?.message || 'Gagal menghapus resep');
+    }
+    setShowDeleteConfirm(false);
   };
 
   if (loading) {
@@ -143,16 +199,91 @@ const RecipeDetail = () => {
           </div>
         </div>
 
-        {/* Start Cooking Button */}
-        <div className="flex gap-4">
+        {/* Missing Ingredients Warning */}
+        {missingIngredients.length > 0 && (
+          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
+                  Bahan belum lengkap
+                </h3>
+                <p className="text-sm text-yellow-700 dark:text-yellow-400 mb-2">
+                  Anda kekurangan {missingIngredients.length} bahan:
+                </p>
+                <ul className="text-sm text-yellow-700 dark:text-yellow-400 space-y-1">
+                  {missingIngredients.slice(0, 3).map((ing, idx) => (
+                    <li key={idx}>
+                      • {ing.ingredientName}{ing.variant ? ` - ${ing.variant}` : ''}: {ing.quantity} {ing.unit}
+                    </li>
+                  ))}
+                  {missingIngredients.length > 3 && (
+                    <li>• dan {missingIngredients.length - 3} bahan lainnya</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-3">
           <button
-            onClick={() => navigate(`/recipe/${recipe._id}/cook`)}
-            className="flex-1 btn-primary flex items-center justify-center gap-2 py-4 text-lg"
+            onClick={handleStartCooking}
+            className="btn-primary flex items-center justify-center gap-2 py-4 text-lg"
           >
             <Play size={24} />
             Start CoCook
           </button>
+
+          {/* Edit & Delete buttons - Only show for recipe owner */}
+          {user && recipe.user && user.id === recipe.user._id && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate(`/recipe/${recipe._id}/edit`)}
+                className="flex-1 btn-secondary flex items-center justify-center gap-2 py-3"
+              >
+                <Edit2 size={20} />
+                Edit Resep
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-2 py-3 transition-colors"
+              >
+                <Trash2 size={20} />
+                Hapus Resep
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Hapus Resep?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Apakah Anda yakin ingin menghapus resep "{recipe.title}"? Tindakan ini tidak dapat dibatalkan.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 btn-secondary"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2 transition-colors"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

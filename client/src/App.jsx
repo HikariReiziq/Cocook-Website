@@ -11,6 +11,7 @@ import History from './pages/History';
 import RecipeDetail from './pages/RecipeDetail';
 import CookingMode from './pages/CookingMode';
 import EditProfile from './pages/EditProfile';
+import EditRecipe from './pages/EditRecipe';
 
 // Layout
 import Layout from './components/Layout';
@@ -41,6 +42,7 @@ function App() {
         <Route path="inventory" element={<Inventory />} />
         <Route path="recipe" element={<Recipe />} />
         <Route path="recipe/:id" element={<RecipeDetail />} />
+        <Route path="recipe/:id/edit" element={<EditRecipe />} />
         <Route path="recipe/:id/cook" element={<CookingMode />} />
         <Route path="history" element={<History />} />
         <Route path="profile" element={<EditProfile />} />

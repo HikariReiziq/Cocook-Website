@@ -73,8 +73,11 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('Login attempt:', { email, passwordLength: password?.length });
+
     // Validasi input
     if (!email || !password) {
+      console.log('Validation failed: missing email or password');
       return res.status(400).json({
         success: false,
         message: 'Email dan password harus diisi'
@@ -83,6 +86,8 @@ export const login = async (req, res) => {
 
     // Cari user dan include password
     const user = await User.findOne({ email }).select('+password');
+    console.log('User found:', user ? 'Yes' : 'No');
+    
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -92,6 +97,8 @@ export const login = async (req, res) => {
 
     // Cek password
     const isPasswordMatch = await user.comparePassword(password);
+    console.log('Password match:', isPasswordMatch);
+    
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
@@ -166,6 +173,9 @@ export const updateProfile = async (req, res) => {
     if (name !== undefined) updateData.name = name;
     if (theme !== undefined) updateData.theme = theme;
     if (job !== undefined) updateData.job = job || '';
+
+    // Skip history logging for theme changes only
+    const isOnlyThemeChange = theme !== undefined && !name && !job && !profilePhotoUrl && !req.file;
     
     // Priority: file upload > URL > existing
     if (req.file) {
@@ -180,14 +190,21 @@ export const updateProfile = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    // Log history
-    await History.create({
-      user: user._id,
-      action: 'Update',
-      category: 'Profile',
-      detail: 'Mengubah profil pengguna',
-      relatedId: user._id
-    });
+    // Log history only if not theme-only change
+    if (!isOnlyThemeChange) {
+      let detailParts = [];
+      if (name) detailParts.push('nama');
+      if (job) detailParts.push('pekerjaan');
+      if (req.file || profilePhotoUrl) detailParts.push('foto profil');
+      
+      await History.create({
+        user: user._id,
+        action: 'Update',
+        category: 'Profile',
+        detail: `Mengubah profil pengguna: ${detailParts.join(', ')}`,
+        relatedId: user._id
+      });
+    }
 
     res.status(200).json({
       success: true,

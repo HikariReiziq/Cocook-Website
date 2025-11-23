@@ -269,7 +269,7 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
 
           {/* Custom Name Input - Shows when Custom is selected */}
           {formData.ingredientName === 'Custom' && (
-            <div>
+            <div className="border-2 border-primary-300 dark:border-primary-600 rounded-lg p-4 bg-primary-50 dark:bg-primary-900/20">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nama Bahan Custom *
               </label>
@@ -282,6 +282,9 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
                 placeholder="Masukkan nama bahan custom (contoh: Beras Organik Premium)"
                 required={formData.ingredientName === 'Custom'}
               />
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Masukkan nama spesifik untuk bahan ini
+              </p>
             </div>
           )}
 

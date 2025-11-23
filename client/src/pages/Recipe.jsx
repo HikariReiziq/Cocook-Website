@@ -390,21 +390,38 @@ const Recipe = () => {
                 />
               </div>
 
-              {/* Cooking Time */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Waktu Memasak (menit) *
-                </label>
-                <input
-                  type="number"
-                  name="cookingTime"
-                  value={formData.cookingTime}
-                  onChange={handleInputChange}
-                  className="input-field"
-                  min="1"
-                  placeholder="30"
-                  required
-                />
+              {/* Cooking Time & Servings */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Waktu Memasak (menit) *
+                  </label>
+                  <input
+                    type="number"
+                    name="cookingTime"
+                    value={formData.cookingTime}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    min="1"
+                    placeholder="30"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Jumlah Porsi *
+                  </label>
+                  <input
+                    type="number"
+                    name="servings"
+                    value={formData.servings}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    min="1"
+                    placeholder="4"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Recipe Image */}

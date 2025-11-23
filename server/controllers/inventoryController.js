@@ -130,12 +130,12 @@ export const createInventory = async (req, res) => {
     // Update status (expired & low stock)
     await inventory.updateStatus();
 
-    // Log history
+    // Log history with detailed info
     await History.create({
       user: req.user.id,
       action: 'Create',
       category: 'Inventory',
-      detail: `Menambahkan bahan baru: ${ingredientName}${variant ? ` - ${variant}` : ''}`,
+      detail: `Menambahkan bahan baru: ${ingredientName}${variant ? ` - ${variant}` : ''} sebanyak ${quantity} ${unit}`,
       relatedId: inventory._id
     });
 
@@ -209,12 +209,12 @@ export const updateInventory = async (req, res) => {
     // Update status
     await inventory.updateStatus();
 
-    // Log history
+    // Log history with deleted quantity info
     await History.create({
       user: req.user.id,
-      action: 'Update',
+      action: 'Delete',
       category: 'Inventory',
-      detail: `Mengubah bahan: ${inventory.ingredientName}${inventory.variant ? ` - ${inventory.variant}` : ''}`,
+      detail: `Menghapus bahan: ${inventory.ingredientName}${inventory.variant ? ` - ${inventory.variant}` : ''} (${inventory.quantity} ${inventory.unit})`,
       relatedId: inventory._id
     });
 

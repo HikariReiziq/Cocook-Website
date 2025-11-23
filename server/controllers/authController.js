@@ -49,6 +49,7 @@ export const register = async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          job: user.job,
           profilePhoto: user.profilePhoto,
           theme: user.theme
         },
@@ -110,6 +111,7 @@ export const login = async (req, res) => {
           name: user.name,
           email: user.email,
           profilePhoto: user.profilePhoto,
+          job: user.job,
           theme: user.theme
         },
         token
@@ -139,6 +141,7 @@ export const getMe = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePhoto: user.profilePhoto,
+        job: user.job,
         theme: user.theme
       }
     });
@@ -157,12 +160,19 @@ export const getMe = async (req, res) => {
 // @access  Private
 export const updateProfile = async (req, res) => {
   try {
-    const { name, theme } = req.body;
+    const { name, theme, job, profilePhotoUrl } = req.body;
     const updateData = {};
 
-    if (name) updateData.name = name;
-    if (theme) updateData.theme = theme;
-    if (req.file) updateData.profilePhoto = `/uploads/${req.file.filename}`;
+    if (name !== undefined) updateData.name = name;
+    if (theme !== undefined) updateData.theme = theme;
+    if (job !== undefined) updateData.job = job || '';
+    
+    // Priority: file upload > URL > existing
+    if (req.file) {
+      updateData.profilePhoto = `/uploads/${req.file.filename}`;
+    } else if (profilePhotoUrl) {
+      updateData.profilePhoto = profilePhotoUrl;
+    }
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -187,6 +197,7 @@ export const updateProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePhoto: user.profilePhoto,
+        job: user.job,
         theme: user.theme
       }
     });

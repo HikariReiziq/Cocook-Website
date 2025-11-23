@@ -28,7 +28,13 @@ const EditProfile = () => {
         photoUrl: '',
         job: user.job || ''
       });
-      setPhotoPreview(user.profilePhoto || '');
+      // Set preview dengan full URL
+      if (user.profilePhoto) {
+        const photoUrl = user.profilePhoto.startsWith('http') 
+          ? user.profilePhoto 
+          : `http://localhost:5000${user.profilePhoto}`;
+        setPhotoPreview(photoUrl);
+      }
     }
   }, [user]);
 
@@ -64,7 +70,7 @@ const EditProfile = () => {
 
     // Validasi
     const newErrors = {};
-    if (!formData.name) {
+    if (!formData.name.trim()) {
       newErrors.name = 'Nama wajib diisi';
     }
 
@@ -77,18 +83,28 @@ const EditProfile = () => {
 
     try {
       const data = new FormData();
-      data.append('name', formData.name);
-      data.append('job', formData.job);
+      data.append('name', formData.name.trim());
+      data.append('job', formData.job.trim());
       
       if (photoFile) {
         data.append('profilePhoto', photoFile);
-      } else if (formData.photoUrl) {
-        data.append('profilePhotoUrl', formData.photoUrl);
+      } else if (formData.photoUrl.trim()) {
+        data.append('profilePhotoUrl', formData.photoUrl.trim());
       }
+
+      console.log('Sending update:', { 
+        name: formData.name, 
+        job: formData.job,
+        hasFile: !!photoFile,
+        photoUrl: formData.photoUrl 
+      });
 
       const response = await authService.updateProfile(data);
       
+      console.log('Update response:', response);
+      
       if (response.success) {
+        // Update user in context
         updateUser(response.data);
         alert('✅ Profile berhasil diperbarui!');
         navigate('/');
@@ -145,6 +161,12 @@ const EditProfile = () => {
                   src={photoPreview}
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700"
+                  onError={(e) => {
+                    console.error('Failed to load image:', photoPreview);
+                    e.target.onerror = null;
+                    e.target.style.display = 'none';
+                    setPhotoPreview('');
+                  }}
                 />
               ) : (
                 <div className="w-32 h-32 rounded-full bg-primary-600 text-white flex items-center justify-center text-3xl font-bold border-4 border-gray-200 dark:border-gray-700">

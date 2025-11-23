@@ -127,7 +127,7 @@ const CookingMode = () => {
               </h2>
             </div>
             <p className="text-lg text-gray-900 dark:text-white leading-relaxed">
-              {recipe.steps[currentStep]}
+              {recipe.steps[currentStep]?.instruction || recipe.steps[currentStep]}
             </p>
           </div>
 

@@ -111,12 +111,22 @@ export const createRecipe = async (req, res) => {
     const parsedIngredients = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
     const parsedSteps = typeof steps === 'string' ? JSON.parse(steps) : steps;
 
+    // Transform steps jika array of strings jadi array of objects
+    const formattedSteps = Array.isArray(parsedSteps) 
+      ? parsedSteps.map((step, index) => {
+          if (typeof step === 'string') {
+            return { stepNumber: index + 1, instruction: step };
+          }
+          return step;
+        })
+      : [];
+
     const recipeData = {
       user: req.user.id,
       title,
       description: description || '',
       ingredients: parsedIngredients,
-      steps: parsedSteps,
+      steps: formattedSteps,
       cookingTime: cookingTime ? parseInt(cookingTime) : 0,
       servings: servings ? parseInt(servings) : 1,
       isPublic: isPublic !== undefined ? isPublic : true
@@ -188,7 +198,17 @@ export const updateRecipe = async (req, res) => {
     if (title) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (ingredients) updateData.ingredients = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
-    if (steps) updateData.steps = typeof steps === 'string' ? JSON.parse(steps) : steps;
+    if (steps) {
+      const parsedSteps = typeof steps === 'string' ? JSON.parse(steps) : steps;
+      updateData.steps = Array.isArray(parsedSteps) 
+        ? parsedSteps.map((step, index) => {
+            if (typeof step === 'string') {
+              return { stepNumber: index + 1, instruction: step };
+            }
+            return step;
+          })
+        : [];
+    }
     if (cookingTime !== undefined) updateData.cookingTime = parseInt(cookingTime);
     if (servings !== undefined) updateData.servings = parseInt(servings);
     if (isPublic !== undefined) updateData.isPublic = isPublic;

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Upload, Link as LinkIcon } from 'lucide-react';
 import { inventoryService } from '../services';
 import { 
   CATEGORIES, 
@@ -13,25 +13,32 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
     category: editItem.category,
     ingredientType: editItem.ingredientName,
     ingredientName: editItem.variant || '',
+    customName: '',
     variant: editItem.variant || '',
     quantity: editItem.quantity,
     unit: editItem.unit,
     expirationDate: editItem.expirationDate.split('T')[0],
     minimumStock: editItem.minimumStock,
-    photo: null
+    photo: null,
+    photoUrl: ''
   } : {
     category: '',
     ingredientType: '',
     ingredientName: '',
+    customName: '',
     variant: '',
     quantity: '',
     unit: 'gram',
     expirationDate: '',
     minimumStock: '',
-    photo: null
+    photo: null,
+    photoUrl: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(editItem?.photo ? `http://localhost:5000/${editItem.photo}` : '');
+  const fileInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,12 +49,19 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
       if (name === 'category') {
         newData.ingredientType = '';
         newData.ingredientName = '';
+        newData.customName = '';
         newData.variant = '';
       } else if (name === 'ingredientType') {
         newData.ingredientName = '';
+        newData.customName = '';
         newData.variant = '';
       } else if (name === 'ingredientName') {
+        newData.customName = '';
         newData.variant = '';
+        // If "Custom" selected, enable custom input
+        if (value !== 'Custom') {
+          newData.variant = value;
+        }
       }
       
       return newData;
@@ -55,23 +69,68 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
   };
 
   const handleFileChange = (e) => {
-    setFormData(prev => ({ ...prev, photo: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, photo: file, photoUrl: '' }));
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setFormData(prev => ({ ...prev, photoUrl: url, photo: null }));
+    if (url) {
+      setPhotoPreview(url);
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      setFormData(prev => ({ ...prev, photo: file, photoUrl: '' }));
+      setPhotoPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Determine final variant name
+    let finalVariant = formData.variant;
+    if (formData.ingredientName === 'Custom' && formData.customName) {
+      finalVariant = formData.customName;
+    } else if (!finalVariant) {
+      finalVariant = formData.ingredientName;
+    }
+    
     const data = new FormData();
     data.append('category', formData.category);
     data.append('ingredientName', formData.ingredientType);
-    data.append('variant', formData.variant || formData.ingredientName);
+    data.append('variant', finalVariant);
     data.append('quantity', formData.quantity);
     data.append('unit', formData.unit);
     data.append('expirationDate', formData.expirationDate);
     data.append('minimumStock', formData.minimumStock);
+    
     if (formData.photo) {
       data.append('photo', formData.photo);
+    } else if (formData.photoUrl) {
+      data.append('photoUrl', formData.photoUrl);
     }
 
     try {
@@ -182,6 +241,24 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
             </div>
           )}
 
+          {/* Custom Name Input */}
+          {formData.ingredientName === 'Custom' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nama Bahan Custom *
+              </label>
+              <input
+                type="text"
+                name="customName"
+                value={formData.customName}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="Masukkan nama bahan custom"
+                required
+              />
+            </div>
+          )}
+
           {/* Quantity and Unit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -249,17 +326,106 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
             />
           </div>
 
-          {/* Photo Upload */}
+          {/* Photo Upload with Drag & Drop */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Foto Nota Belanja (Opsional)
             </label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              className="input-field"
-            />
+            
+            {/* Drag & Drop Area */}
+            <div
+              className={`border-2 border-dashed rounded-lg p-6 text-center ${
+                dragActive 
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
+                  : 'border-gray-300 dark:border-gray-600'
+              } ${formData.photoUrl ? 'opacity-50 pointer-events-none' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+                disabled={!!formData.photoUrl}
+              />
+              
+              {photoPreview && !formData.photoUrl ? (
+                <div className="space-y-2">
+                  <img 
+                    src={photoPreview} 
+                    alt="Preview" 
+                    className="max-h-40 mx-auto rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-sm text-primary-600 hover:text-primary-700"
+                  >
+                    Ganti Foto
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Upload className="w-12 h-12 mx-auto text-gray-400" />
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      Klik untuk upload
+                    </button>
+                    <span className="text-gray-500 dark:text-gray-400"> atau drag & drop</span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    PNG, JPG, maksimal 5MB
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* URL Input */}
+            <div className="mt-3">
+              <div className="relative mb-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Atau gunakan link URL</span>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="url"
+                  name="photoUrl"
+                  value={formData.photoUrl}
+                  onChange={handleUrlChange}
+                  className="input-field pl-10"
+                  placeholder="https://example.com/photo.jpg"
+                  disabled={!!formData.photo}
+                />
+              </div>
+              
+              {formData.photoUrl && photoPreview && (
+                <div className="mt-2">
+                  <img 
+                    src={photoPreview} 
+                    alt="URL Preview" 
+                    className="max-h-40 mx-auto rounded"
+                    onError={() => {
+                      alert('Gagal memuat gambar dari URL. Periksa kembali URL gambar.');
+                      setPhotoPreview('');
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Submit Buttons */}

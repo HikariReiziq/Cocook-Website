@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  job: {
+    type: String,
+    default: ''
+  },
   theme: {
     type: String,
     enum: ['light', 'dark'],

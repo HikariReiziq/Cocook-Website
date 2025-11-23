@@ -112,6 +112,8 @@ export const createInventory = async (req, res) => {
 
     if (req.file) {
       inventoryData.photo = `/uploads/${req.file.filename}`;
+    } else if (req.body.photoUrl) {
+      inventoryData.photo = req.body.photoUrl;
     }
 
     const inventory = await Inventory.create(inventoryData);
@@ -183,7 +185,11 @@ export const updateInventory = async (req, res) => {
     if (unit) updateData.unit = unit;
     if (expirationDate) updateData.expirationDate = new Date(expirationDate);
     if (minimumStock !== undefined) updateData.minimumStock = parseFloat(minimumStock);
-    if (req.file) updateData.photo = `/uploads/${req.file.filename}`;
+    if (req.file) {
+      updateData.photo = `/uploads/${req.file.filename}`;
+    } else if (req.body.photoUrl) {
+      updateData.photo = req.body.photoUrl;
+    }
 
     inventory = await Inventory.findByIdAndUpdate(
       req.params.id,

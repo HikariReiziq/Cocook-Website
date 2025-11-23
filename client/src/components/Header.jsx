@@ -47,9 +47,13 @@ const Header = () => {
           >
             {user?.profilePhoto ? (
               <img
-                src={user.profilePhoto}
+                src={user.profilePhoto.startsWith('http') ? user.profilePhoto : `http://localhost:5000${user.profilePhoto}`}
                 alt={user.name}
                 className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="50" fill="%23dc2626"/%3E%3Ctext x="50" y="60" text-anchor="middle" fill="white" font-size="40" font-family="sans-serif"%3E' + getInitials(user?.name || 'U') + '%3C/text%3E%3C/svg%3E';
+                }}
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-semibold">

@@ -59,17 +59,23 @@ const RecipeDetail = () => {
 
       {/* Recipe Header */}
       <div className="card">
-        {recipe.image && (
+        {recipe.photo && (
           <img
-            src={`http://localhost:5000/${recipe.image}`}
-            alt={recipe.name}
+            src={`http://localhost:5000${recipe.photo}`}
+            alt={recipe.title}
             className="w-full h-64 md:h-96 object-cover rounded-lg mb-6"
           />
         )}
 
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          {recipe.name}
+          {recipe.title}
         </h1>
+
+        {recipe.description && (
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            {recipe.description}
+          </p>
+        )}
 
         <div className="flex flex-wrap gap-4 text-gray-600 dark:text-gray-400 mb-6">
           <div className="flex items-center gap-2">
@@ -82,7 +88,11 @@ const RecipeDetail = () => {
           </div>
           <div className="flex items-center gap-2">
             <Users size={20} />
-            <span>Oleh: {recipe.createdBy?.name || 'Anonymous'}</span>
+            <span>{recipe.servings || 1} porsi</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users size={20} />
+            <span>Oleh: {recipe.user?.name || 'Anonymous'}</span>
           </div>
         </div>
 
@@ -123,10 +133,10 @@ const RecipeDetail = () => {
             {recipe.steps.map((step, index) => (
               <div key={index} className="flex gap-4">
                 <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary-600 text-white rounded-full font-semibold">
-                  {index + 1}
+                  {step.stepNumber || (index + 1)}
                 </div>
                 <p className="flex-1 text-gray-900 dark:text-white pt-1">
-                  {step}
+                  {step.instruction || step}
                 </p>
               </div>
             ))}

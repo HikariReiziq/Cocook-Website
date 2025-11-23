@@ -17,11 +17,14 @@ const Recipe = () => {
   
   // Form states
   const [formData, setFormData] = useState({
-    name: '',
-    image: null,
+    title: '',
+    description: '',
+    photo: null,
     ingredients: [],
     steps: [],
-    cookingTime: ''
+    cookingTime: '',
+    servings: 1,
+    isPublic: true
   });
 
   // Temporary ingredient form
@@ -60,7 +63,7 @@ const Recipe = () => {
   };
 
   const handleImageChange = (e) => {
-    setFormData(prev => ({ ...prev, image: e.target.files[0] }));
+    setFormData(prev => ({ ...prev, photo: e.target.files[0] }));
   };
 
   const handleIngredientChange = (e) => {
@@ -150,13 +153,16 @@ const Recipe = () => {
     }
 
     const data = new FormData();
-    data.append('name', formData.name);
-    data.append('cookingTime', formData.cookingTime);
+    data.append('title', formData.title);
+    data.append('description', formData.description || '');
+    data.append('cookingTime', formData.cookingTime || 0);
+    data.append('servings', formData.servings || 1);
+    data.append('isPublic', formData.isPublic);
     data.append('ingredients', JSON.stringify(formData.ingredients));
     data.append('steps', JSON.stringify(formData.steps));
     
-    if (formData.image) {
-      data.append('image', formData.image);
+    if (formData.photo) {
+      data.append('photo', formData.photo);
     }
 
     try {
@@ -174,11 +180,14 @@ const Recipe = () => {
   const closeFormModal = () => {
     setShowFormModal(false);
     setFormData({
-      name: '',
-      image: null,
+      title: '',
+      description: '',
+      photo: null,
       ingredients: [],
       steps: [],
-      cookingTime: ''
+      cookingTime: '',
+      servings: 1,
+      isPublic: true
     });
     setTempIngredient({
       category: '',
@@ -249,10 +258,10 @@ const Recipe = () => {
               onClick={() => navigate(`/recipe/${recipe._id}`)}
             >
               {/* Image */}
-              {recipe.image ? (
+              {recipe.photo ? (
                 <img
-                  src={`http://localhost:5000/${recipe.image}`}
-                  alt={recipe.name}
+                  src={`http://localhost:5000${recipe.photo}`}
+                  alt={recipe.title}
                   className="w-full h-48 object-cover rounded-lg mb-3"
                 />
               ) : (
@@ -263,8 +272,14 @@ const Recipe = () => {
 
               {/* Content */}
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                {recipe.name}
+                {recipe.title}
               </h3>
+
+              {recipe.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                  {recipe.description}
+                </p>
+              )}
 
               <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-1">
@@ -279,7 +294,7 @@ const Recipe = () => {
 
               {/* Creator Info */}
               <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-                Oleh: {recipe.createdBy?.name || 'Anonymous'}
+                Oleh: {recipe.user?.name || 'Anonymous'}
               </div>
             </div>
           ))}
@@ -300,19 +315,34 @@ const Recipe = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-              {/* Recipe Name */}
+              {/* Recipe Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nama Resep *
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="title"
+                  value={formData.title}
                   onChange={handleInputChange}
                   className="input-field"
                   placeholder="Contoh: Nasi Goreng Ala Rumah"
                   required
+                />
+              </div>
+
+              {/* Recipe Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Deskripsi (Opsional)
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="input-field"
+                  placeholder="Ceritakan tentang resep ini..."
+                  rows="3"
                 />
               </div>
 

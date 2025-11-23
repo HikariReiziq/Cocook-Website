@@ -87,7 +87,7 @@ Aplikasi ini memiliki fitur-fitur "Minimum Viable Product" sebagai berikut:
     - **Delete:** Menghapus bahan yang sudah habis atau busuk.
 
 3.  **Upload Gambar**
-    - Pengguna dapat mengunggah foto asli bahan makanan saat input data agar lebih mudah dikenali visualnya.
+    - Pengguna dapat mengunggah foto nota saat input data agar lebih mudah dikenali visualnya.
 
 ---
 

@@ -89,6 +89,10 @@ export const getRecipeById = async (req, res) => {
 // @access  Private
 export const createRecipe = async (req, res) => {
   try {
+    console.log('=== Create Recipe Request ===');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
+
     const {
       title,
       description,
@@ -101,6 +105,7 @@ export const createRecipe = async (req, res) => {
 
     // Validasi input
     if (!title || !ingredients || !steps) {
+      console.log('Validation failed:', { title, ingredients, steps });
       return res.status(400).json({
         success: false,
         message: 'Judul, bahan, dan langkah memasak harus diisi'
@@ -111,6 +116,9 @@ export const createRecipe = async (req, res) => {
     const parsedIngredients = typeof ingredients === 'string' ? JSON.parse(ingredients) : ingredients;
     const parsedSteps = typeof steps === 'string' ? JSON.parse(steps) : steps;
 
+    console.log('Parsed ingredients:', parsedIngredients);
+    console.log('Parsed steps:', parsedSteps);
+
     // Transform steps jika array of strings jadi array of objects
     const formattedSteps = Array.isArray(parsedSteps) 
       ? parsedSteps.map((step, index) => {
@@ -120,6 +128,8 @@ export const createRecipe = async (req, res) => {
           return step;
         })
       : [];
+
+    console.log('Formatted steps:', formattedSteps);
 
     const recipeData = {
       user: req.user.id,
@@ -134,7 +144,10 @@ export const createRecipe = async (req, res) => {
 
     if (req.file) {
       recipeData.photo = `/uploads/${req.file.filename}`;
+      console.log('Photo uploaded:', recipeData.photo);
     }
+
+    console.log('Recipe data to create:', recipeData);
 
     const recipe = await Recipe.create(recipeData);
 

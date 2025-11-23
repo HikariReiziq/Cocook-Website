@@ -32,6 +32,7 @@ const Recipe = () => {
     category: '',
     ingredientType: '',
     ingredientName: '',
+    customName: '',
     quantity: '',
     unit: 'gram'
   });
@@ -74,8 +75,14 @@ const Recipe = () => {
       if (name === 'category') {
         newData.ingredientType = '';
         newData.ingredientName = '';
+        newData.customName = '';
       } else if (name === 'ingredientType') {
         newData.ingredientName = '';
+        newData.customName = '';
+      } else if (name === 'ingredientName') {
+        if (value !== 'Custom') {
+          newData.customName = '';
+        }
       }
       
       return newData;
@@ -89,10 +96,21 @@ const Recipe = () => {
       return;
     }
 
+    // Check if Custom is selected but customName is empty
+    if (tempIngredient.ingredientName === 'Custom' && !tempIngredient.customName.trim()) {
+      alert('Masukkan nama bahan custom');
+      return;
+    }
+
+    // Determine final variant name
+    const finalVariant = tempIngredient.ingredientName === 'Custom' 
+      ? tempIngredient.customName.trim()
+      : tempIngredient.ingredientName;
+
     const ingredient = {
       category: tempIngredient.category,
       ingredientName: tempIngredient.ingredientType,
-      variant: tempIngredient.ingredientName,
+      variant: finalVariant,
       quantity: parseFloat(tempIngredient.quantity),
       unit: tempIngredient.unit
     };
@@ -106,6 +124,7 @@ const Recipe = () => {
       category: '',
       ingredientType: '',
       ingredientName: '',
+      customName: '',
       quantity: '',
       unit: 'gram'
     });
@@ -142,6 +161,14 @@ const Recipe = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log('=== Recipe Form Submit ==>');
+    console.log('Title:', formData.title);
+    console.log('Description:', formData.description);
+    console.log('Cooking Time:', formData.cookingTime);
+    console.log('Photo:', formData.photo);
+    console.log('Ingredients:', formData.ingredients);
+    console.log('Steps:', formData.steps);
+
     if (formData.ingredients.length === 0) {
       alert('Tambahkan minimal 1 bahan');
       return;
@@ -149,6 +176,11 @@ const Recipe = () => {
 
     if (formData.steps.length === 0) {
       alert('Tambahkan minimal 1 langkah');
+      return;
+    }
+
+    if (!formData.photo) {
+      alert('Foto resep wajib diisi');
       return;
     }
 
@@ -165,15 +197,26 @@ const Recipe = () => {
       data.append('photo', formData.photo);
     }
 
+    console.log('FormData being sent:', {
+      title: formData.title,
+      hasPhoto: !!formData.photo,
+      ingredientsCount: formData.ingredients.length,
+      stepsCount: formData.steps.length
+    });
+
     try {
       const response = await recipeService.create(data);
+      console.log('Recipe create response:', response);
       if (response.success) {
+        alert('✅ Resep berhasil ditambahkan!');
         await fetchRecipes();
         closeFormModal();
       }
     } catch (error) {
       console.error('Error creating recipe:', error);
-      alert(error.response?.data?.message || 'Gagal menyimpan resep');
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      alert(error.response?.data?.message || error.message || 'Gagal menyimpan resep');
     }
   };
 
@@ -193,6 +236,7 @@ const Recipe = () => {
       category: '',
       ingredientType: '',
       ingredientName: '',
+      customName: '',
       quantity: '',
       unit: 'gram'
     });
@@ -425,6 +469,18 @@ const Recipe = () => {
                         <option key={name} value={name}>{name}</option>
                       ))}
                     </select>
+                  )}
+
+                  {/* Custom Name Input */}
+                  {tempIngredient.ingredientName === 'Custom' && (
+                    <input
+                      type="text"
+                      name="customName"
+                      value={tempIngredient.customName}
+                      onChange={handleIngredientChange}
+                      className="input-field"
+                      placeholder="Masukkan nama bahan custom"
+                    />
                   )}
 
                   <div className="grid grid-cols-3 gap-3">

@@ -37,11 +37,16 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState(editItem?.photo ? `http://localhost:5000/${editItem.photo}` : '');
+  const [photoPreview, setPhotoPreview] = useState(
+    editItem?.photo 
+      ? (editItem.photo.startsWith('http') ? editItem.photo : `http://localhost:5000${editItem.photo}`)
+      : ''
+  );
   const fileInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log('Input changed:', name, value);
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
       
@@ -56,14 +61,18 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
         newData.customName = '';
         newData.variant = '';
       } else if (name === 'ingredientName') {
-        newData.customName = '';
-        newData.variant = '';
-        // If "Custom" selected, enable custom input
-        if (value !== 'Custom') {
+        // If "Custom" selected, clear variant and require custom input
+        if (value === 'Custom') {
+          newData.customName = '';
+          newData.variant = '';
+        } else {
+          // For non-custom, set variant to the selected name
           newData.variant = value;
+          newData.customName = '';
         }
       }
       
+      console.log('Form data updated:', newData);
       return newData;
     });
   };
@@ -110,6 +119,9 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    console.log('=== Inventory Form Submit ==>');
+    console.log('Form Data:', formData);
+    
     // Determine final variant name
     let finalVariant = formData.variant;
     if (formData.ingredientName === 'Custom' && formData.customName) {
@@ -117,6 +129,8 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
     } else if (!finalVariant) {
       finalVariant = formData.ingredientName;
     }
+
+    console.log('Final Variant:', finalVariant);
     
     const data = new FormData();
     data.append('category', formData.category);
@@ -129,27 +143,39 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
     
     if (formData.photo) {
       data.append('photo', formData.photo);
+      console.log('Photo file:', formData.photo.name);
     } else if (formData.photoUrl) {
       data.append('photoUrl', formData.photoUrl);
+      console.log('Photo URL:', formData.photoUrl);
     }
+
+    console.log('Sending data to server...');
 
     try {
       if (editItem) {
+        console.log('Updating inventory:', editItem._id);
         const response = await inventoryService.update(editItem._id, data);
+        console.log('Update response:', response);
         if (response.success) {
+          alert('✅ Bahan berhasil diupdate!');
           onSuccess && onSuccess();
           onClose();
         }
       } else {
+        console.log('Creating new inventory...');
         const response = await inventoryService.create(data);
+        console.log('Create response:', response);
         if (response.success) {
+          alert('✅ Bahan berhasil ditambahkan!');
           onSuccess && onSuccess();
           onClose();
         }
       }
     } catch (error) {
       console.error('Error saving inventory:', error);
-      alert(error.response?.data?.message || 'Gagal menyimpan data');
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      alert(error.response?.data?.message || error.message || 'Gagal menyimpan data');
     } finally {
       setIsSubmitting(false);
     }
@@ -241,7 +267,7 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
             </div>
           )}
 
-          {/* Custom Name Input */}
+          {/* Custom Name Input - Shows when Custom is selected */}
           {formData.ingredientName === 'Custom' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -253,8 +279,8 @@ const InventoryForm = ({ isOpen, onClose, onSuccess, editItem = null }) => {
                 value={formData.customName}
                 onChange={handleInputChange}
                 className="input-field"
-                placeholder="Masukkan nama bahan custom"
-                required
+                placeholder="Masukkan nama bahan custom (contoh: Beras Organik Premium)"
+                required={formData.ingredientName === 'Custom'}
               />
             </div>
           )}

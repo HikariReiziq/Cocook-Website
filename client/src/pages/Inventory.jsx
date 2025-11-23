@@ -288,9 +288,14 @@ const Inventory = () => {
                 {/* Image */}
                 {item.photo ? (
                   <img
-                    src={`http://localhost:5000/${item.photo}`}
+                    src={item.photo.startsWith('http') ? item.photo : `http://localhost:5000${item.photo}`}
                     alt={item.ingredientName}
                     className="w-full h-32 object-cover rounded-lg mb-3"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                      e.target.parentElement.innerHTML = '<div class="w-full h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center"><svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
@@ -540,7 +545,7 @@ const Inventory = () => {
               {/* Image */}
               {selectedItem.photo && (
                 <img
-                  src={`http://localhost:5000/${selectedItem.photo}`}
+                  src={selectedItem.photo.startsWith('http') ? selectedItem.photo : `http://localhost:5000${selectedItem.photo}`}
                   alt={selectedItem.ingredientName}
                   className="w-full h-48 object-cover rounded-lg"
                 />

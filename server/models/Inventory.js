@@ -10,15 +10,17 @@ const inventorySchema = new mongoose.Schema({
     type: String,
     required: [true, 'Kategori harus diisi'],
     enum: [
-      'Bahan Pokok',
-      'Protein',
-      'Sayur',
-      'Buah',
-      'Produk Susu & Olahan',
-      'Bumbu & Rempah',
-      'Penyedap & Saus',
-      'Minuman',
-      'Lainnya'
+      'UTILITAS & DASAR',
+      'BUMBU & REMPAH',
+      'SAYURAN SEGAR',
+      'BUAH-BUAHAN',
+      'PROTEIN HEWANI',
+      'BAHAN KERING (PANTRY)',
+      'SAUS MINYAK & PENYEDAP',
+      'DAIRY & OLAHAN',
+      'BAHAN BAKING',
+      'MINUMAN',
+      'CONSUMABLES (NON-FOOD)'
     ]
   },
   ingredientName: {
@@ -39,7 +41,7 @@ const inventorySchema = new mongoose.Schema({
   unit: {
     type: String,
     required: [true, 'Satuan harus diisi'],
-    enum: ['kg', 'gram', 'mg', 'liter', 'ml', 'lb', 'ton', 'kwintal', 'lusin', 'pcs', 'pack']
+    enum: ['kg', 'gram', 'mg', 'liter', 'ml', 'lb', 'ton', 'kwintal', 'lusin', 'pcs', 'pack', 'sdm', 'sdt', 'siung', 'batang', 'ikat']
   },
   expirationDate: {
     type: Date,

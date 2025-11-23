@@ -81,6 +81,10 @@ export const getInventoryById = async (req, res) => {
 // @access  Private
 export const createInventory = async (req, res) => {
   try {
+    console.log('=== Create Inventory Request ===');
+    console.log('Body:', req.body);
+    console.log('File:', req.file);
+
     const {
       category,
       ingredientName,
@@ -93,6 +97,7 @@ export const createInventory = async (req, res) => {
 
     // Validasi input
     if (!category || !ingredientName || !quantity || !unit || !expirationDate) {
+      console.log('Validation failed:', { category, ingredientName, quantity, unit, expirationDate });
       return res.status(400).json({
         success: false,
         message: 'Data belum lengkap. Harap isi semua field yang diperlukan'
@@ -112,9 +117,13 @@ export const createInventory = async (req, res) => {
 
     if (req.file) {
       inventoryData.photo = `/uploads/${req.file.filename}`;
+      console.log('Photo uploaded:', inventoryData.photo);
     } else if (req.body.photoUrl) {
       inventoryData.photo = req.body.photoUrl;
+      console.log('Photo URL:', inventoryData.photo);
     }
+
+    console.log('Inventory data to create:', inventoryData);
 
     const inventory = await Inventory.create(inventoryData);
 

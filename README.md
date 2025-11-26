@@ -1,101 +1,152 @@
-# 🍳 Cocook — Smart Kitchen Management App
-> **Vibe Coding Week Project** — Solving Real Problems with MERN Stack.
+# 🍳 Cocook — Smart Kitchen Management System
 
-![Cocook Banner](https://via.placeholder.com/1000x300?text=Cocook:+Manage+Kitchen,+Reduce+Waste,+Cook+Better)
-*(Ganti link gambar di atas dengan screenshot aplikasi kamu nanti)*
+| Nama                         | NRP        |
+| ---------------------------- | ---------- |
+| M. Hikari Reiziq Rakhmadinta | 5027241079 |
 
----
 
-## 📖 Tentang Project (Assignment Breakdown)
-Project ini dikerjakan untuk memenuhi tugas **Vibe Coding Week** mata kuliah Pemrograman Web. Fokus utama dari tugas ini adalah **"Solve a Real Problem"**, di mana aplikasi tidak hanya sekadar latihan CRUD, tetapi memberikan solusi nyata bagi pengguna.
+![Banner](/Assets/Home.png)
 
-### 📋 Syarat & Ketentuan Tugas:
-Sesuai dengan panduan Vibe Coding Week, aplikasi ini memenuhi kriteria berikut:
-- **Tema:** *Problem Solving* di lingkungan sekitar (Rumah Tangga & Mahasiswa).
-- **Tech Stack Wajib:** MERN (MongoDB, Express.js, React.js, Node.js).
-- **Fitur Minimum MVP:**
-  - ✅ **Authentication:** Register & Login menggunakan JWT & Bcrypt.
-  - ✅ **CRUD Data Utama:** Manajemen Inventaris Bahan Makanan.
-  - ✅ **Upload File:** Upload foto bahan makanan/struk belanja.
-  - ✅ **Frontend:** Minimal 3 halaman (Login, Dashboard, Form).
-  - ✅ **Responsif:** Mobile & Desktop Friendly.
+**Cocook** adalah aplikasi berbasis web yang dirancang untuk membantu manajemen dapur rumah tangga dan anak kos. Aplikasi ini berfokus pada penyelesaian masalah nyata (*problem solving*) seperti pemborosan makanan (*food waste*), manajemen stok bahan, dan kebingungan dalam menentukan menu masakan.
 
 ---
 
-## 💡 Inovasi: Cocook (Dapur Pintar)
-**Cocook** adalah adaptasi web dari konsep aplikasi manajemen dapur untuk membantu mahasiswa (anak kos) dan ibu rumah tangga dalam mengelola stok dapur mereka.
+## 📖 Latar Belakang
 
-### 1. Latar Belakang Masalah (Problem Statement)
-- **Food Waste:** Banyak bahan makanan terbuang sia-sia karena pemilik lupa tanggal kadaluarsa atau tertimbun di belakang kulkas. Data menunjukkan timbulan sampah rumah tangga bisa mencapai jutaan ton per tahun.
-- **Kebingungan Masak:** Masalah klasik *"Hari ini masak apa?"* sering terjadi padahal stok bahan tersedia, namun pengguna bingung mengombinasikannya.
-- **Inefisiensi Belanja:** Belanja impulsif sering terjadi karena tidak adanya pencatatan stok yang akurat, merugikan secara finansial terutama bagi mahasiswa.
+Di tengah kesibukan harian, banyak orang—terutama mahasiswa dan ibu rumah tangga—sering melupakan bahan makanan yang tersimpan di kulkas hingga membusuk. Masalah ini diperparah dengan kebiasaan belanja impulsif tanpa mengetahui stok yang sebenarnya, serta dilema klasik *"Hari ini masak apa?"* padahal bahan tersedia.
 
-### 2. Solusi yang Ditawarkan
-Cocook hadir sebagai **Asisten Dapur Digital** berbasis web yang memiliki fitur:
-- **Inventory Tracker:** Mencatat stok bahan masuk, jumlah, dan tanggal kadaluarsa.
-- **Expiration Alert:** Indikator visual (warna) untuk bahan yang hampir busuk.
-- **Smart Recipe Ideas:** (Fitur pengembangan) Memberikan saran masakan berdasarkan bahan yang *available* di inventaris.
+Berdasarkan riset, jutaan ton sampah rumah tangga dihasilkan setiap tahunnya, sebagian besar berasal dari sisa makanan. **Cocook** hadir sebagai solusi digital untuk mencatat inventaris, memberikan peringatan dini kadaluarsa, dan mengintegrasikan stok bahan dengan rekomendasi resep.
 
-### 3. Target Pengguna
-- **Mahasiswa/Anak Kos (e.g., Raka):** Sering lupa stok, budget terbatas, butuh manajemen simpel.
-- **Ibu Rumah Tangga (e.g., Ibu Lestari):** Mengelola stok dapur keluarga besar, butuh efisiensi agar tidak ada bahan terbuang.
+## 🎯 Tujuan
+
+1.  **Mengurangi Food Waste:** Mencegah bahan makanan terbuang sia-sia dengan sistem pelacakan kadaluarsa (FIFO/Batch System).
+2.  **Efisiensi Ekonomi:** Membantu pengguna berbelanja dengan bijak dengan memantau stok yang menipis.
+3.  **Manajemen Dapur Terpusat:** Menggabungkan pencatatan inventaris dan panduan memasak dalam satu platform.
+4.  **Edukasi & Komunitas:** Menyediakan wadah berbagi resep yang terhubung langsung dengan ketersediaan bahan pengguna.
 
 ---
 
-## 🛠️ Tech Stack & Tools
-Aplikasi ini dibangun menggunakan **MERN Stack** modern dengan styling menggunakan **Tailwind CSS** untuk mempercepat pengembangan (Vibe Coding style).
+## 🛠️ Teknologi yang Digunakan
 
-### **Frontend (Client-Side)**
-- **Framework:** React.js (Vite) — *Cepat dan ringan.*
-- **Styling:** Tailwind CSS + DaisyUI — *Untuk UI modern dan responsif tanpa coding CSS manual yang lama.*
-- **State Management:** React Context API — *Untuk manajemen state user (Login/Logout).*
-- **Routing:** React Router DOM — *Navigasi antar halaman.*
-- **HTTP Client:** Axios — *Fetch data ke backend.*
-- **Icons:** Lucide React / React Icons.
-- **Notifications:** React Hot Toast / SweetAlert2.
+Aplikasi ini dibangun menggunakan **MERN Stack** dengan pendekatan *Vibe Coding* (modern, cepat, dan efisien):
 
-### **Backend (Server-Side)**
-- **Runtime:** Node.js.
-- **Framework:** Express.js — *REST API Architecture.*
-- **Database:** MongoDB Atlas (Cloud).
-- **ODM:** Mongoose — *Schema modeling.*
-- **Authentication:**
-  - `jsonwebtoken` (JWT) — *Session token.*
-  - `bcryptjs` — *Password hashing.*
-- **File Handling:** Multer — *Upload gambar ke server.*
-- **Security:** CORS.
+### Frontend
+-   **React.js (Vite):** Framework UI yang cepat dan reaktif.
+-   **Tailwind CSS:** Styling utility-first untuk desain yang responsif (*Mobile First*).
+-   **React Context API:** Manajemen state global (Auth & Theme).
+-   **Axios:** HTTP Client untuk komunikasi dengan API.
+-   **Lucide React:** Ikon antarmuka yang modern.
 
-### **Tools Lainnya**
-- **Package Manager:** NPM / PNPM.
-- **Version Control:** Git & Github.
-- **API Testing:** Postman / Thunder Client.
+### Backend
+-   **Node.js & Express.js:** Server-side runtime dan framework REST API.
+-   **MongoDB Atlas & Mongoose:** Database NoSQL untuk penyimpanan data yang fleksibel.
+-   **JWT (JSON Web Token):** Autentikasi pengguna yang aman.
+-   **BcryptJS:** Hashing password.
+-   **Multer:** Middleware untuk menangani upload file gambar.
 
 ---
 
-## 🚀 Fitur Utama (MVP)
-Aplikasi ini memiliki fitur-fitur "Minimum Viable Product" sebagai berikut:
+## 📸 Dokumentasi & Fitur Aplikasi
 
-1.  **Sistem Autentikasi**
-    - User dapat mendaftar (Register) dan Masuk (Login).
-    - Password dienkripsi demi keamanan.
-    - Akses halaman diproteksi (Hanya user login yang bisa lihat dashboard).
+Berikut adalah penjelasan alur dan fitur utama aplikasi Cocook:
 
-2.  **Manajemen Inventaris (CRUD)**
-    - **Create:** Input bahan makanan baru (Nama, Kategori, Jumlah, Expired Date, Foto).
-    - **Read:** Melihat daftar bahan makanan dengan indikator warna (Merah = Segera Habiskan, Hijau = Aman).
-    - **Update:** Mengedit jumlah stok atau detail bahan.
-    - **Delete:** Menghapus bahan yang sudah habis atau busuk.
+### 1. Autentikasi Pengguna
+![Halaman Login](/Assets/Login.png)
+Halaman masuk yang aman. Pengguna baru dapat mendaftar akun untuk mulai mengelola dapur mereka sendiri. Data pengguna dilindungi dengan enkripsi password standar industri.
 
-3.  **Upload Gambar**
-    - Pengguna dapat mengunggah foto nota saat input data agar lebih mudah dikenali visualnya.
+### 2. Dashboard Utama
+![Dashboard](/Assets/Home.png)
+Pusat informasi dapur Anda.
+* **Alert Cards:** Menampilkan jumlah bahan yang *Akan Kadaluarsa*, *Stok Menipis*, dan *Sudah Kadaluarsa*.
+* **Segera Kadaluarsa:** List prioritas bahan yang harus segera diolah (H-7).
+* **Aktivitas Terbaru:** Log singkat kegiatan terakhir pengguna.
+
+### 3. Manajemen Inventaris (Inventory)
+![Inventory](/Assets/Inventory.png)
+Fitur inti aplikasi untuk mencatat bahan makanan.
+* **Kartu Bahan:** Menampilkan foto, nama, varian, sisa stok, dan status kadaluarsa (indikator warna).
+* **Filtering:** Filter berdasarkan kategori (Sayur, Protein, Bumbu, dll) dan urutan kadaluarsa terdekat.
+* **Sistem Batch:** Input bahan yang sama dengan tanggal beli berbeda akan dicatat terpisah untuk akurasi *First-In-First-Out* (FIFO).
+
+### 4. Katalog Resep
+![Recipe](/Assets/Recipe.png)
+Kumpulan inspirasi masakan.
+* **Daftar Resep:** Menampilkan resep pribadi dan komunitas lengkap dengan estimasi waktu masak dan jumlah bahan.
+* **Detail Resep:** Informasi langkah memasak dan bahan yang dibutuhkan.
+
+### 5. Menambahkan Resep Baru
+![Tambah Resep](/Assets/Tambahkan%20resep%20ke%20komunitas.png)
+Pengguna dapat berkontribusi dengan menambahkan resep mereka sendiri.
+* **Form Dinamis:** Input judul, deskripsi, foto, bahan-bahan, dan langkah memasak.
+* **Integrasi Unit:** Satuan bahan disesuaikan dengan standar sistem (gram, sdm, pcs, dll).
+
+### 6. Mode Memasak (Cooking Mode)
+![Start Cook](/Assets/Start%20Cook.png)
+Fitur unggulan **"Start CoCook"**.
+* **Panduan Langkah:** Menampilkan instruksi memasak langkah demi langkah agar pengguna fokus.
+* **Otomatisasi Stok:** Saat tombol "Selesai" ditekan, sistem secara cerdas mengurangi stok di inventaris berdasarkan bahan yang digunakan dalam resep tersebut.
+
+### 7. Riwayat Aktivitas (History)
+![History](/Assets/History.png)
+Audit trail untuk memantau kegiatan dapur.
+* Mencatat setiap aksi: *Create* (Tambah bahan), *Update* (Edit stok), *Delete* (Buang bahan), dan *Cook* (Masak).
+* Membantu pengguna mengevaluasi pola konsumsi dan pemborosan mereka.
+
+### 8. Profil Pengguna
+![Profile](/Assets/Profile.png)
+Pengaturan personalisasi akun, termasuk mengubah foto profil dan informasi pekerjaan.
 
 ---
 
-## 💻 Cara Menjalankan Project (Setup Instructions)
+## 💾 Database Structure
 
-Ikuti langkah ini untuk menjalankan project di komputer lokal:
+Aplikasi menggunakan MongoDB dengan skema relasional yang terstruktur:
 
-### 1. Clone Repository
-```bash
-git clone [https://github.com/username-kamu/vibe-coding-pweb.git](https://github.com/username-kamu/vibe-coding-pweb.git)
-cd vibe-coding-pweb
+* **Users:** Menyimpan data akun.
+![MongoDB User](/Assets/MongoDB_User.png)
+
+* **Inventories:** Menyimpan data stok bahan per user.
+![MongoDB Inventory](/Assets/MongoDB_Inventory.png)
+
+---
+
+## 🚀 Harapan Pengembangan (Future Work)
+
+Untuk pengembangan selanjutnya, aplikasi ini diharapkan dapat memiliki fitur:
+1.  **AI Integration:** Menggunakan Gemini/OpenAI untuk menyarankan resep unik berdasarkan sisa bahan yang "tanggung".
+2.  **Barcode Scanner:** Memindai barcode produk kemasan untuk input inventaris otomatis.
+3.  **Push Notification:** Notifikasi *real-time* ke HP pengguna saat bahan H-1 kadaluarsa.
+4.  **Shopping List Generator:** Otomatis membuat daftar belanja saat stok menyentuh batas minimum.
+
+---
+
+## 💻 Cara Menjalankan (Local Setup)
+
+1.  **Clone Repository**
+    ```bash
+    git clone [https://github.com/username/cocook-website.git](https://github.com/username/cocook-website.git)
+    cd cocook-website
+    ```
+
+2.  **Setup Backend**
+    ```bash
+    cd server
+    npm install
+    # Buat file .env dan isi: PORT, MONGODB_URI, JWT_SECRET
+    npm start
+    ```
+
+3.  **Setup Frontend**
+    ```bash
+    cd client
+    npm install
+    npm run dev
+    ```
+
+4.  **Akses Aplikasi**
+    Buka browser dan kunjungi `http://localhost:5173`.
+
+---
+
+**Dibuat oleh:** Hikari Reiziq (Mahasiswa IT)
+*Project Vibe Coding Week - Pemrograman Web*
